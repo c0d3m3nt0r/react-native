@@ -52,17 +52,30 @@ import com.facebook.infer.annotation.Assertions;
     // because Display.getCurrentSizeRange doesn't include it.
     Resources resources = context.getResources();
     int statusBarId = resources.getIdentifier("status_bar_height", "dimen", "android");
+    int navigationBarId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
     int statusBarHeight = 0;
-    if (windowFullscreen && statusBarId > 0) {
+    int navigationBarHeight = 0;
+    if (windowFullscreen){
+      if (statusBarId > 0) {
         statusBarHeight = (int) resources.getDimension(statusBarId);
+      }
+      if (navigationBarId > 0) {
+        navigationBarHeight = (int) resources.getDimension(navigationBarId);
+      } else {
+        if (SIZE_POINT.x < SIZE_POINT.y) {
+          navigationBarHeight = SIZE_POINT.y - MAX_POINT.y - statusBarHeight;
+        } else {
+          navigationBarHeight = SIZE_POINT.x - MAX_POINT.x;
+        }
+      }
     }
 
     if (SIZE_POINT.x < SIZE_POINT.y) {
       // If we are vertical the width value comes from min width and height comes from max height
-      return new Point(MIN_POINT.x, MAX_POINT.y + statusBarHeight);
+      return new Point(MIN_POINT.x, MAX_POINT.y + statusBarHeight + navigationBarHeight);
     } else {
       // If we are horizontal the width value comes from max width and height comes from min height
-      return new Point(MAX_POINT.x, MIN_POINT.y + statusBarHeight);
+      return new Point(MAX_POINT.x + navigationBarHeight, MIN_POINT.y + statusBarHeight);
     }
   }
 }
