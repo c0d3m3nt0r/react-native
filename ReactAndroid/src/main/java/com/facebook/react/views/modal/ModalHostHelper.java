@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Point;
+import android.icu.text.TimeZoneFormat;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -23,6 +25,8 @@ import com.facebook.infer.annotation.Assertions;
   private static final Point MIN_POINT = new Point();
   private static final Point MAX_POINT = new Point();
   private static final Point SIZE_POINT = new Point();
+
+  private static final String LOG_TAG = "ModalHostHelper";
 
   /**
    * To get the size of the screen, we use information from the WindowManager and
@@ -70,12 +74,35 @@ import com.facebook.infer.annotation.Assertions;
       }
     }
 
-    if (SIZE_POINT.x < SIZE_POINT.y) {
-      // If we are vertical the width value comes from min width and height comes from max height
-      return new Point(MIN_POINT.x, MAX_POINT.y + statusBarHeight + navigationBarHeight);
-    } else {
-      // If we are horizontal the width value comes from max width and height comes from min height
-      return new Point(MAX_POINT.x + navigationBarHeight, MIN_POINT.y + statusBarHeight);
-    }
+    final Point p = SIZE_POINT.x < SIZE_POINT.y
+            ? new Point(MIN_POINT.x, MAX_POINT.y + statusBarHeight + navigationBarHeight)
+            : new Point(MAX_POINT.x + navigationBarHeight, MIN_POINT.y + statusBarHeight);
+
+    Log.d(LOG_TAG, String.format(
+            "windowFullscreen: %s; " +
+            "SIZE_POINT(%d, %d); " +
+            "MIN_POINT(%d, %d); " +
+            "MAX_POINT(%d, %d); " +
+            "statusBarId: %d; " +
+            "statusBarHeight: %d; " +
+            "navigationBarId: %d; " +
+            "navigationBarHeight: %d; " +
+            "p(%d, %d)",
+            windowFullscreen ? "true" : "false",
+            SIZE_POINT.x,
+            SIZE_POINT.y,
+            MIN_POINT.x,
+            MIN_POINT.y,
+            MAX_POINT.x,
+            MAX_POINT.y,
+            statusBarId,
+            statusBarHeight,
+            navigationBarId,
+            navigationBarHeight,
+            p.x,
+            p.y
+    ));
+
+    return p;
   }
 }
